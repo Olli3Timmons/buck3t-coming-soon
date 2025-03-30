@@ -3,11 +3,13 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
+import { ContainerTextFlip } from './components/ui/container-text-flip';
 
 export default function Home() {
   const [email, setEmail] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -18,12 +20,32 @@ export default function Home() {
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   useEffect(() => {
+    // Set initial window size
+    setWindowSize({
+      width: window.innerWidth,
+      height: window.innerHeight
+    });
+
+    // Handle window resize
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+
+    // Handle mouse move
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
     };
 
+    window.addEventListener('resize', handleResize);
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -125,8 +147,8 @@ export default function Home() {
           className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-red-500/10"
           animate={{
             backgroundPosition: [
-              `${mousePosition.x / window.innerWidth * 100}% ${mousePosition.y / window.innerHeight * 100}%`,
-              `${(mousePosition.x + 100) / window.innerWidth * 100}% ${(mousePosition.y + 100) / window.innerHeight * 100}%`,
+              `${mousePosition.x / windowSize.width * 100}% ${mousePosition.y / windowSize.height * 100}%`,
+              `${(mousePosition.x + 100) / windowSize.width * 100}% ${(mousePosition.y + 100) / windowSize.height * 100}%`,
             ],
           }}
           transition={{ duration: 0.5 }}
@@ -139,8 +161,8 @@ export default function Home() {
           key={i}
           className="absolute w-1 h-1 bg-orange-500/20 rounded-full"
           initial={{
-            x: Math.random() * window.innerWidth,
-            y: Math.random() * window.innerHeight,
+            x: Math.random() * windowSize.width,
+            y: Math.random() * windowSize.height,
             scale: 0,
             opacity: 0,
           }}
@@ -241,7 +263,7 @@ export default function Home() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="text-6xl md:text-8xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-orange-400 via-orange-500 to-red-600 relative"
+          className="text-6xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-orange-400 via-orange-500 to-red-600 relative"
         >
           <motion.span
             className="absolute inset-0 bg-clip-text text-transparent bg-gradient-to-r from-orange-400 via-orange-500 to-red-600 blur-sm"
@@ -254,9 +276,9 @@ export default function Home() {
               ease: "easeInOut",
             }}
           >
-            Something Amazing is Coming Soon
+            Detailing Starts Here <ContainerTextFlip words={["Simplicity", "Quality", "Excellence", "Perfection"]} /> Starts Now.
           </motion.span>
-          Something Amazing is Coming Soon
+          Detailing Starts Here <ContainerTextFlip words={["Simplicity", "Quality", "Excellence", "Perfection"]} /> Starts Now.
         </motion.h1>
         
         {/* Enhanced subheading */}
@@ -277,7 +299,7 @@ export default function Home() {
               ease: "easeInOut",
             }}
           />
-          We're crafting something extraordinary that will revolutionize your experience. Stay tuned for the big reveal!
+          We're making car detailing effortless—find trusted professionals near you, hassle-free.
         </motion.p>
 
         {/* Enhanced form with more interactive elements */}
