@@ -341,7 +341,7 @@ export default function Home() {
             transition={{ delay: 0.4, duration: 0.6 }}
             className="text-xl md:text-2xl text-gray-200 mb-12 max-w-2xl font-light leading-relaxed"
           >
-            BUCK3T connects you with top-rated detailing services nearby. Fast, easy, and hassle-free!
+            BUCK3T connects you with top-rated detailing services nearby. Fast, easy, and hassle-free! 
           </motion.p>
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-red-500/5 to-orange-500/10 blur-2xl"
@@ -377,7 +377,7 @@ export default function Home() {
           className="mb-8"
         >
           <p className="text-lg md:text-xl text-gray-300 font-medium">
-            Be the first to know when <span className="text-orange-400 font-bold">BUCK3T</span> launches!
+            Get notified when <span className="text-orange-400 font-bold">BUCK3T</span> launches!
           </p>
         </motion.div>
 
