@@ -518,7 +518,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               className="mt-4 text-red-400 font-medium"
             >
-              {email && submitStatus === 'error' ? 'This email is already on the waitlist.' : 'Something went wrong. Please try again.'}
+              {email && submitStatus === 'error' ? 'You\'re already on the waitlist! We\'ll see you soon. 🚗' : 'Something went wrong. Please try again.'}
             </motion.p>
           )}
         </motion.form>
