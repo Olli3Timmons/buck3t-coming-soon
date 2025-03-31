@@ -5,10 +5,13 @@ import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { ContainerTextFlip } from './components/ui/container-text-flip';
 import { Badge } from './components/ui/badge';
+import { supabase } from './lib/supabase';
 
 export default function Home() {
   const [email, setEmail] = useState('');
   const [isFocused, setIsFocused] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
   const containerRef = useRef(null);
@@ -49,10 +52,46 @@ export default function Home() {
     };
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Email submitted:', email);
-    setEmail('');
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+
+    try {
+      // First check if email already exists
+      const { data: existingEntry, error: checkError } = await supabase
+        .from('waitlist')
+        .select('email')
+        .eq('email', email)
+        .single();
+
+      if (checkError && checkError.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+        throw checkError;
+      }
+
+      if (existingEntry) {
+        setSubmitStatus('error');
+        return;
+      }
+
+      // Insert new entry
+      const { error: insertError } = await supabase
+        .from('waitlist')
+        .insert([{ email }]);
+
+      if (insertError) {
+        console.error('Supabase error:', insertError);
+        throw insertError;
+      }
+
+      setSubmitStatus('success');
+      setEmail('');
+    } catch (error: any) {
+      console.error('Error submitting email:', error);
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -412,6 +451,7 @@ export default function Home() {
                 className="w-full px-6 py-4 rounded-full bg-gray-800/50 border-2 border-transparent focus:outline-none focus:border-orange-500 backdrop-blur-sm text-white placeholder-gray-400 transition-all duration-300 shadow-lg hover:shadow-orange-500/10 relative z-10"
                 required
                 aria-label="Email address"
+                disabled={isSubmitting}
               />
               <motion.div
                 className="absolute inset-0 rounded-full bg-gradient-to-r from-orange-500/10 to-red-500/10 opacity-0"
@@ -438,18 +478,23 @@ export default function Home() {
               }}
               whileTap={{ scale: 0.95 }}
               type="submit"
-              className="px-8 py-4 rounded-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 transition-all duration-300 font-medium text-white shadow-lg hover:shadow-orange-500/25 flex items-center justify-center gap-2 min-w-[140px] relative overflow-hidden group"
+              className="px-8 py-4 rounded-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 transition-all duration-300 font-medium text-white shadow-lg hover:shadow-orange-500/25 flex items-center justify-center gap-2 min-w-[140px] relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Submit email"
+              disabled={isSubmitting}
             >
-              <span className="relative z-10">Notify Me</span>
-              <motion.span
-                animate={{ x: [0, 5, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-                className="relative z-10"
-                aria-hidden="true"
-              >
-                →
-              </motion.span>
+              <span className="relative z-10">
+                {isSubmitting ? 'Submitting...' : 'Notify Me'}
+              </span>
+              {!isSubmitting && (
+                <motion.span
+                  animate={{ x: [0, 5, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                  className="relative z-10"
+                  aria-hidden="true"
+                >
+                  →
+                </motion.span>
+              )}
               <motion.div
                 className="absolute inset-0 bg-white/20"
                 initial={{ opacity: 0 }}
@@ -458,6 +503,24 @@ export default function Home() {
               />
             </motion.button>
           </div>
+          {submitStatus === 'success' && (
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-4 text-green-400 font-medium"
+            >
+              You're on the list! We'll hit you up when BUCK3T drops. 🚗✨
+            </motion.p>
+          )}
+          {submitStatus === 'error' && (
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-4 text-red-400 font-medium"
+            >
+              {email && submitStatus === 'error' ? 'This email is already on the waitlist.' : 'Something went wrong. Please try again.'}
+            </motion.p>
+          )}
         </motion.form>
       </motion.div>
     </main>
