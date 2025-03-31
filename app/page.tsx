@@ -354,7 +354,7 @@ export default function Home() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="text-6xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-orange-400 via-orange-500 to-red-600 relative tracking-tight"
+          className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-orange-400 via-orange-500 to-red-600 relative tracking-tight"
         >
           <motion.span
             className="absolute inset-0 bg-clip-text text-transparent bg-gradient-to-r from-orange-400 via-orange-500 to-red-600 blur-sm"
@@ -378,7 +378,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.6 }}
-            className="text-xl md:text-2xl text-gray-200 mb-12 max-w-2xl font-light leading-relaxed"
+            className="text-lg sm:text-xl md:text-2xl text-gray-200 mb-12 max-w-2xl font-light leading-relaxed"
           >
             BUCK3T connects you with top-rated detailing services nearby. Fast, easy, and hassle-free! 
           </motion.p>
